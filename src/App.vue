@@ -25,6 +25,8 @@ export default {
     margin:0;
     padding:0;
     background-color: black;
+
+    width: 100%;
   }
 
 </style>

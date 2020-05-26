@@ -4,13 +4,15 @@
             <div class="spacer"></div>
             <div class="menu-container">
                 <div class="logo-container">
+                    <div class="fading-effect-logo"></div>
                     <img src="../assets/k-logo.svg" class="k-logo-lg" alt="Logo for Kevin Thorne">
 
                     <span class="logo-name">Kevin P. Thorne</span>
                 </div>
-                <div class="menu-v-divider"></div>
+                <div class="menu-v-divider slide"></div>
                 <div class="menu-items-container">
-                    <div class="menu-items fade-in">
+                    <div class="fading-effect-menu"></div>
+                    <div class="menu-items">
                         <a>About Me</a>
                         <a>My Services</a>
                         <a>My Work</a>
@@ -34,12 +36,13 @@
 
     .main {
         background: white;
-        border: black solid 0.5vw;
+        border-top: black solid 0.5vw;
+        border-bottom: black solid 0.5vw;
 
         height: 98vh;
         max-height: 98vh;
-        width: 98vw;
-        max-width: 98vw;
+        width: 99.1vw;
+        max-width: 99.1vw;
 
         display: flex;
         flex-direction: column;
@@ -68,6 +71,8 @@
         flex-direction: column;
         justify-content: center;
         align-content: center;
+
+        z-index: 1;
     }
 
     .menu-items a {
@@ -102,15 +107,20 @@
 
     .menu-v-divider {
         width: 0.5vw;
+        max-width: 0.5vw;
         flex-grow: 1;
 
         background-color: black;
 
         margin-right: 2vw;
+
+        z-index: 3;
     }
 
     .menu-items-container {
         flex-grow: 1;
+
+        z-index: 1;
     }
 
     .menu-items {
@@ -122,50 +132,48 @@
         justify-content: space-around;
     }
 
-    .fade-in {
-        animation: fadeIn ease 5s;
-        -webkit-animation: fadeIn ease 5s;
-        -moz-animation: fadeIn ease 5s;
-        -o-animation: fadeIn ease 5s;
-        -ms-animation: fadeIn ease 5s;
-    }
-    @keyframes fadeIn {
-        0% {
-            opacity:0;
-        }
-        100% {
-            opacity:1;
-        }
+    .fading-effect-menu {
+        position: absolute;
+        top: 1vh;
+        right: 1vw;
+
+        height: 55vh;
+        max-height: 55vh;
+        width: 25vw;
+        max-width: 25vw;
+
+        background: white;
+
+        z-index: 2;
+
+        animation: menu-swipe 4s cubic-bezier(.5,.5,0,1);
     }
 
-    @-moz-keyframes fadeIn {
-        0% {
-            opacity:0;
-        }
-        100% {
-            opacity:1;
-        }
+    .fading-effect-logo {
+        position: absolute;
+        top: 1vh;
+        left: 1vw;
+
+        height: 55vh;
+        max-height: 55vh;
+        width: 25vw;
+        max-width: 25vw;
+
+        background: white;
+
+        z-index: 2;
+
+        animation: logo-swipe 4s cubic-bezier(.5,.5,0,1);
     }
 
-    @-webkit-keyframes fadeIn {
-        0% {
-            opacity:0;
-        }
-        100% {
-            opacity:1;
-        }
+    .slide {
+        animation: x-slide 4s cubic-bezier(.5,.5,0,1);
+        -webkit-animation: x-slide 4s cubic-bezier(.5,.5,0,1);
+        -moz-animation: x-slide 4s cubic-bezier(.5,.5,0,1);
+        -o-animation: x-slide 4s cubic-bezier(.5,.5,0,1);
     }
 
-    @-o-keyframes fadeIn {
-        0% {
-            opacity:0;
-        }
-        100% {
-            opacity:1;
-        }
-    }
-
-    @-ms-keyframes fadeIn {
+    @keyframes fade-in {
         0% {
             opacity: 0;
         }
@@ -173,4 +181,73 @@
             opacity: 1;
         }
     }
+
+    @keyframes text-slide {
+        0% {
+            width: 100%;
+        }
+        60% {
+            width: 100%;
+        }
+        75% {
+            width: 0;
+        }
+        100% {
+            width: 0;
+        }
+    }
+
+    @keyframes x-slide {
+        0% {
+            transform: translateX(-5vw) scale(0);
+        }
+        30% {
+            transform: translateX(0) scale(1);
+        }
+        60% {
+            transform: translateX(25vw) scale(1);
+        }
+        75% {
+            transform: translateX(-25vw) scale(1);
+        }
+        90% {
+            transform: translateX(0) scale(1);
+        }
+        100% {
+            transform: translateX(0) scale(1);
+        }
+    }
+
+    @keyframes menu-swipe {
+         0% {
+             transform: translateX(-19vw) translateY(22vh);
+         }
+         30% {
+             transform: translateX(-19vw) translateY(22vh);
+         }
+         60% {
+             transform: translateX(5vw) translateY(22vh);
+         }
+         100% {
+         }
+     }
+
+    @keyframes logo-swipe {
+        0% {
+            transform: translateX(29vw) translateY(22vh);
+        }
+        30% {
+            transform: translateX(29vw) translateY(22vh);
+        }
+        64% {
+            transform: translateX(29vw) translateY(22vh);
+        }
+        72% {
+            transform: translateX(0vw) translateY(22vh);
+        }
+        100% {
+        }
+    }
+
+
 </style>
