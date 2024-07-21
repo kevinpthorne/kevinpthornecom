@@ -6,14 +6,8 @@ mod text;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use bitset::Bitset;
 use pixels::PixelBuffer;
 use pixels::GREEN;
-use text::get_glyph;
-use text::get_glyphs;
-use text::render_glyphs;
-use text::FontGlyph;
-use text::GLYPH_SIZE;
 use wasm_bindgen::prelude::*;
 use web_sys::window;
 
@@ -66,7 +60,7 @@ impl CanvasApp {
 
         let mut cursor_x = 0 as usize;
         let mut cursor_y = 0 as usize;
-        let text: String = "DVDDD".to_string();
+        let text: String = "KEVIN THORNE".to_string();
         // let text_bitmap: Bitset = render_glyphs(&text, 1);
 
         let mut data = vec![0 as u8; width * height * 4]; // RGBA data
@@ -93,7 +87,10 @@ impl CanvasApp {
             }
 
             // render text
-            screenbuff.render_text(&text, (100, 100), GREEN);
+            screenbuff.render_text(&text, (100, 100), GREEN, 1);
+            screenbuff.render_text(&text, (100, 120), GREEN, 2);
+            screenbuff.render_text(&text, (100, 140), GREEN, 3);
+            screenbuff.render_text(&text, (100, 160), GREEN, 4);
             
             let clamped_data = wasm_bindgen::Clamped(screenbuff.data_as_ref());
             let image_data = web_sys::ImageData::new_with_u8_clamped_array(clamped_data, width as u32).unwrap();

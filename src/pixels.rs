@@ -42,17 +42,22 @@ impl PixelBuffer {
         self.data[alpha] = a;
     }
 
-    pub fn render_text(&mut self, text: &String, (screen_x, screen_y): Point, color: Color) {
+    pub fn render_text(&mut self, text: &String, (screen_x, screen_y): Point, color: Color, scale: usize) {
         for (i, c) in text.chars().enumerate() {
             let glyph = get_glyph(c);
             let glyph_bitmap = Bitset::from_u32(glyph);
             for y in 0..GLYPH_SIZE {
                 for x in 0..GLYPH_SIZE {
-                    let screen_y_offset = screen_y + y;
-                    let screen_x_offset = screen_x + x + (i * GLYPH_SIZE) + (i * KERNING);
                     let glyph_offset = y * GLYPH_SIZE + x;
-                    if glyph_bitmap.get(glyph_offset) {
-                        self.set((screen_x_offset, screen_y_offset), color);
+
+                    for scale_offset_y in 0..scale {
+                        for scale_offset_x in 0..scale {
+                            let screen_y_offset = screen_y + (y * scale) + scale_offset_y;
+                            let screen_x_offset = screen_x + (x * scale) + (i * GLYPH_SIZE * scale) + (i * KERNING) + scale_offset_x;
+                            if glyph_bitmap.get(glyph_offset) {
+                                self.set((screen_x_offset, screen_y_offset), color);
+                            }
+                        }
                     }
                 }
             }
