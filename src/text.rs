@@ -1,10 +1,26 @@
+use crate::bitset::Bitset;
+
 pub type FontGlyph = u32;
 
+/// Glyphs are a 5x5 grid
+/// 
+/// most significant 7 bits are currently unused.
+/// 
+/// Layout
+/// ----------------
+/// |24|23|22|21|20|
+/// |19|18|17|16|15|
+/// |14|13|12|11|10|
+/// | 9| 8| 7| 6| 5|
+/// | 4| 3| 2| 1| 0|
+/// ----------------
 const A: FontGlyph = 0b0000000_0010001010011100101001010;
-const D: FontGlyph = 0b0000000_1111010001100011000111110;
-const V: FontGlyph = 0b0000000_1000110001100010101000100;
+const D: FontGlyph = 0b0000000_0011101001100010100100111;
+const V: FontGlyph = 0b0000000_0010001010100011000110001;
 const UNKNOWN: FontGlyph = 0b0000000_1010101010101010101010101;
 
+pub const GLYPH_LEN: usize = 32 - 7;
+pub const GLYPH_SIZE: usize = 5;
 // const FONT: Vec<FontGlyph> = vec![A, D, V];
 
 pub fn get_glyph(c: char) -> FontGlyph {
@@ -39,20 +55,33 @@ pub fn get_glyphs(s: String) -> Vec<FontGlyph> {
 //     result
 // }
 
-pub fn render_glyphs(text: &str) -> Vec<u8> {
-    let mut bitmap: Vec<u8> = Vec::new();
-    for c in text.chars() {
-        let glyph_byte = get_glyph(c);
-        for row in 0..5 {
-            let mut row_bits = 0;
-            for col in 0..5 {
-                let mask = 1 << (7 - col);
-                if (glyph_byte & mask) != 0 {
-                    row_bits |= 1 << col;
-                }
+pub fn render_glyphs(text: &str, size: usize) -> Bitset {
+    // TODO size is unused
+    let mut bitset = Bitset::new(GLYPH_LEN * size * text.len());
+    let glyphs: Vec<Bitset> = text.chars().map(|c| Bitset::from_u32(get_glyph(c))).collect();
+    let mut j: usize = 0;
+    for row in 0..GLYPH_SIZE {
+        for i in 0..(text.len()) {
+            let glyph = &glyphs[i];
+            for col in 0..GLYPH_SIZE {
+                let bitmap_offset = j;
+                let glyph_offset = (row * GLYPH_SIZE) + col;
+                bitset.set(bitmap_offset, glyph.get(glyph_offset));
+                j += 1;
+                // TODO glyphs may be reflected
             }
-            bitmap.push(row_bits);
         }
     }
-    bitmap
+
+    bitset
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_render() {
+        render_glyphs("DV", 1);
+    }
 }

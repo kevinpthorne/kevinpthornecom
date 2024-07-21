@@ -48,6 +48,7 @@ impl Bitset {
     fn size(&self) -> usize {
         self.data.len() * 8
     }
+
 }
 
 #[cfg(test)]
