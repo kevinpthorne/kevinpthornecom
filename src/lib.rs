@@ -60,7 +60,7 @@ impl CanvasApp {
 
         let mut cursor_x = 0 as usize;
         let mut cursor_y = 0 as usize;
-        let text: String = "KEVIN THORNE".to_string();
+        let text: String = "ECHOSPOT".to_string();
         // let text_bitmap: Bitset = render_glyphs(&text, 1);
 
         let mut data = vec![0 as u8; width * height * 4]; // RGBA data
