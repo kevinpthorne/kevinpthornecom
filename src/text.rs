@@ -21,6 +21,7 @@ const UNKNOWN: FontGlyph = 0b0000000_1010101010101010101010101;
 
 pub const GLYPH_LEN: usize = 32 - 7;
 pub const GLYPH_SIZE: usize = 5;
+pub const KERNING: usize = 1;
 // const FONT: Vec<FontGlyph> = vec![A, D, V];
 
 pub fn get_glyph(c: char) -> FontGlyph {

@@ -66,7 +66,7 @@ impl CanvasApp {
 
         let mut cursor_x = 0 as usize;
         let mut cursor_y = 0 as usize;
-        let text: String = "DVD".to_string();
+        let text: String = "DVDDD".to_string();
         // let text_bitmap: Bitset = render_glyphs(&text, 1);
 
         let mut data = vec![0 as u8; width * height * 4]; // RGBA data
@@ -86,6 +86,9 @@ impl CanvasApp {
                 for x in 0..width {
                     let blue = (255.0 * ((1.0 / 255.0) * 3.14 * tick as f32).sin() + 255.0) as u8;
                     screenbuff.set((x, y), (0, 0, blue, 255));
+                    if y >= 100 && y < 105 && x >= 100 && x < 100+25 {
+                        screenbuff.set((x, y), (0, 0, 0, 255));
+                    }
                 }
             }
 

@@ -1,4 +1,4 @@
-use crate::{bitset::Bitset, text::{get_glyph, GLYPH_SIZE}};
+use crate::{bitset::Bitset, text::{get_glyph, GLYPH_SIZE, KERNING}};
 
 
 pub type Point = (usize, usize);
@@ -45,13 +45,13 @@ impl PixelBuffer {
     pub fn render_text(&mut self, text: &String, (screen_x, screen_y): Point, color: Color) {
         for (i, c) in text.chars().enumerate() {
             let glyph = get_glyph(c);
-            let bitmap = Bitset::from_u32(glyph);
+            let glyph_bitmap = Bitset::from_u32(glyph);
             for y in 0..GLYPH_SIZE {
                 for x in 0..GLYPH_SIZE {
                     let screen_y_offset = screen_y + y;
-                    let screen_x_offset = screen_x + x + (i * GLYPH_SIZE);
-                    let offset = y * GLYPH_SIZE + x;
-                    if bitmap.get(offset) {
+                    let screen_x_offset = screen_x + x + (i * GLYPH_SIZE) + (i * KERNING);
+                    let glyph_offset = y * GLYPH_SIZE + x;
+                    if glyph_bitmap.get(glyph_offset) {
                         self.set((screen_x_offset, screen_y_offset), color);
                     }
                 }
