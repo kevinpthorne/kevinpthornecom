@@ -13,7 +13,7 @@
   "license": "UNLICENSED",
   "description": "",
   "dependencies": {
-    "kevinpthornecom_wasm": "file:../kevinpthornecom_wasm/pkg"
+    "kevinpthornecom_wasm": "file:../../kevinpthornecom_wasm/pkg"
   },
   "devDependencies": {
     "html-webpack-plugin": "^5.6.0",

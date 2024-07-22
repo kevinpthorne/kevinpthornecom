@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   kevinpthornecom_wasm:
-    specifier: file:../kevinpthornecom_wasm/pkg
-    version: file:../kevinpthornecom_wasm/pkg
+    specifier: file:../../kevinpthornecom_wasm/pkg
+    version: file:../../kevinpthornecom_wasm/pkg
 
 devDependencies:
   html-webpack-plugin:
@@ -2622,7 +2622,7 @@ packages:
         optional: true
     dev: true
 
-  file:../kevinpthornecom_wasm/pkg:
-    resolution: {directory: ../kevinpthornecom_wasm/pkg, type: directory}
+  file:../../kevinpthornecom_wasm/pkg:
+    resolution: {directory: ../../kevinpthornecom_wasm/pkg, type: directory}
     name: kevinpthornecom_wasm
     dev: false
