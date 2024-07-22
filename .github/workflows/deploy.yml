@@ -17,19 +17,21 @@ jobs:
         with:
           ref: prod
       # Rust
-      - run: cd wasm/
       - run: cargo install wasm-pack
+        working-directory: ./wasm
       - run: wasm-pack build
+        working-directory: ./wasm
       # JS
-      - run: cd ../js
       - name: Install Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 22
       - name: npm install
         run: npm install
+        working-directory: ./js
       - name: npm run build
         run: npm run build
+        working-directory: ./js
       # Deploy
       - name: AWS CLI setup
         uses: aws-actions/configure-aws-credentials@v1.7.0
@@ -44,6 +46,7 @@ jobs:
         env:
           AWS_S3_BUCKET: ${{ secrets.S3_BUCKET_NAME }}
           SOURCE_DIR: ${{ vars.BUILD_DIR || 'dist' }}
+        working-directory: ./js
       - name: Clear CloudFront Cache
         run: aws cloudfront create-invalidation --distribution-id $DISTRO_ID --paths "/*"
         env:
