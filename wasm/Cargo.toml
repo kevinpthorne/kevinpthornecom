@@ -28,6 +28,9 @@ features = [
   'HtmlCanvasElement',
   'ImageData',
   'Window',
+  'EventTarget',
+  'Event',
+  'MouseEvent',
 ]
 
 [dev-dependencies]

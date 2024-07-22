@@ -1,17 +1,17 @@
-use crate::{bitset::Bitset, text::{get_glyph, GLYPH_SIZE, KERNING}};
+use crate::{bitset::Bitset, text::{get_glyph, GLYPH_SIZE, KERNING}, ui::Point};
 
 
-pub type Point = (usize, usize);
 pub type Color = (u8, u8, u8, u8);
 
+pub const WHITE: Color = (255, 255, 255, 255);
 pub const RED: Color = (255, 0, 0, 255);
 pub const BLUE: Color = (0, 0, 255, 255);
 pub const GREEN: Color = (0, 255, 0, 255);
 
 pub struct PixelBuffer {
     data: Vec<u8>,
-    width: usize,
-    height: usize,
+    pub width: usize,
+    pub height: usize,
 }
 
 pub const NUM_CHANNELS: usize = 4;
@@ -45,7 +45,7 @@ impl PixelBuffer {
     pub fn render_text(&mut self, text: &String, (screen_x, screen_y): Point, color: Color, scale: usize) {
         for (i, c) in text.chars().enumerate() {
             let glyph = get_glyph(c);
-            let glyph_bitmap = Bitset::from_u32(glyph);
+            let glyph_bitmap = Bitset::from_u32(glyph); // TODO memoize
             for y in 0..GLYPH_SIZE {
                 for x in 0..GLYPH_SIZE {
                     let glyph_offset = y * GLYPH_SIZE + x;
