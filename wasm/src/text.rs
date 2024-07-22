@@ -1,5 +1,3 @@
-use crate::bitset::Bitset;
-
 pub type FontGlyph = u32;
 
 /// Glyphs are a 5x5 grid

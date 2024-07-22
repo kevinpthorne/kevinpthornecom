@@ -7,6 +7,10 @@ mod utils;
 use pixels::PixelBuffer;
 use pixels::GREEN;
 use pixels::WHITE;
+use ui::Button;
+use ui::Rectangle;
+use ui::Renderable;
+use ui::Text;
 use wasm_bindgen::prelude::*;
 use web_sys::window;
 use web_sys::MouseEvent;
@@ -42,6 +46,7 @@ pub struct CanvasApp {
     screenbuff: PixelBuffer,
     tick: usize,
     last_frame_time: u32,
+    ui_elements: Vec<Box<dyn Renderable>>,
 }
 
 #[wasm_bindgen]
@@ -49,11 +54,23 @@ impl CanvasApp {
     pub fn new(canvas: web_sys::HtmlCanvasElement) -> Result<CanvasApp, JsValue> {
         let width = window().unwrap().inner_width().unwrap().as_f64().unwrap() as usize;
         let height = window().unwrap().inner_height().unwrap().as_f64().unwrap() as usize;
+        
+        // TODO rip this out of the constructor
+        let text_text: String = "ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789 !@#$%^&*()[]{}\\|;':\",./<>?-=_+`~".to_string();
         let instance = Self {
             canvas,
             screenbuff: PixelBuffer::new(width, height),
             tick: 0,
             last_frame_time: 0,
+            ui_elements: vec![
+                Box::new(Text::new((50, 50), "KEVIN THORNE".to_string(), 4, WHITE)),
+                Box::new(Text::new((50, 100), text_text.clone().to_string(), 1, GREEN)),
+                Box::new(Text::new((50, 110), text_text.clone().to_string(), 2, GREEN)),
+                Box::new(Text::new((50, 125), text_text.clone().to_string(), 3, GREEN)),
+                Box::new(Text::new((50, 145), text_text.clone().to_string(), 4, GREEN)),
+                Box::new(Rectangle::new(((10, 100), (20, 110)), WHITE)),
+                Box::new(Button::new((10, 170), "BOOP".to_string(), 3, (120, 120, 120, 255), WHITE)),
+            ],
         };
         Ok(instance)
     }
@@ -84,29 +101,23 @@ impl CanvasApp {
     }
 
     fn render(&mut self, delta_time: u32) -> Result<(), JsValue> {
-        let title: String = "KEVIN THORNE".to_string();
-        let text: String = "ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789 !@#$%^&*()[]{}\\|;':\",./<>?-=_+`~".to_string();
         let tick_str: String = self.tick.to_string();
         let frametime_str: String = delta_time.to_string();
 
+        // fancy gradient background
         for y in 0..self.screenbuff.height {
             for x in 0..self.screenbuff.width {
                 let blue = (255.0 * ((1.0 / 255.0) * 3.14 * self.tick as f32).sin() + 255.0) as u8;
                 self.screenbuff.set((x, y), (0, 0, blue, 255));
-                if y >= 100 && y < 105 && x >= 100 && x < 100 + 25 {
-                    self.screenbuff.set((x, y), (0, 0, 0, 255));
-                }
             }
         }
 
-        // render text
-        self.screenbuff.render_text(&title, (50, 50), WHITE, 4);
+        // render UI elements
+        for e in &self.ui_elements {
+            e.render(&mut self.screenbuff);
+        }
         self.screenbuff.render_text(&tick_str, (0, 0), GREEN, 2);
         self.screenbuff.render_text(&frametime_str, (0, 15), GREEN, 2);
-        self.screenbuff.render_text(&text, (50, 100), GREEN, 1);
-        self.screenbuff.render_text(&text, (50, 110), GREEN, 2);
-        self.screenbuff.render_text(&text, (50, 125), GREEN, 3);
-        self.screenbuff.render_text(&text, (50, 145), GREEN, 4);
 
         let clamped_data = wasm_bindgen::Clamped(self.screenbuff.data_as_ref());
         let image_data =
