@@ -1,17 +1,44 @@
+use web_sys::MouseEvent;
+
 use crate::{
-    bitset::Bitset,
-    pixels::{Color, PixelBuffer},
-    text::{get_glyph, GLYPH_SIZE, KERNING},
+    bitset::Bitset, pixels::{darken, Color, PixelBuffer}, text::{get_glyph, GLYPH_SIZE, KERNING}
 };
 
+/// x, y
 pub type Point = (usize, usize);
+/// topleft, bottomright
 pub type Rect = (Point, Point);
 
-pub trait Renderable {
-    fn render(&self, buffer: &mut PixelBuffer) -> ();
+pub fn is_point_in_rect((x, y): Point, rect: Rect) -> bool {
+    let (topleft, bottomright) = rect;
+    let (topleft_x, topleft_y) = topleft;
+    let (bottomright_x, bottomright_y) = bottomright;
+
+    x >= topleft_x && y >= topleft_y && x <= bottomright_x && y <=bottomright_y
 }
-pub trait Clickable {
-    fn on_click(&self) -> ();
+
+pub trait Renderable {
+    fn render(&mut self, buffer: &mut PixelBuffer) -> ();
+}
+pub enum Gesture {
+    MouseDown,
+    MouseUp
+}
+impl Gesture {
+    pub fn of(event: MouseEvent) -> Option<Gesture> {
+        match event.type_().as_str() {
+            "mousedown" => Some(Self::MouseDown),
+            "mouseup" => Some(Self::MouseUp),
+            _ => {
+                // console_log!("{:?}", event.type_());
+                None
+            },
+        }
+    }
+}
+pub trait GestureHandler: Renderable {
+    fn on_event(&mut self, type_: Gesture) -> ();
+    fn get_collision_rect(&self) -> Rect;
 }
 
 pub struct Text {
@@ -32,7 +59,7 @@ impl Text {
 }
 
 impl Renderable for Text {
-    fn render(&self, buffer: &mut PixelBuffer) {
+    fn render(&mut self, buffer: &mut PixelBuffer) {
         for (i, c) in self.text.chars().enumerate() {
             let glyph = get_glyph(c);
             let glyph_bitmap = Bitset::from_u32(glyph); // TODO memoize
@@ -69,7 +96,7 @@ impl Rectangle {
     }
 }
 impl Renderable for Rectangle {
-    fn render(&self, buffer: &mut PixelBuffer) -> () {
+    fn render(&mut self, buffer: &mut PixelBuffer) -> () {
         let ((topleft_x, topleft_y), (botright_x, botright_y)) = self.rect;
         for y in topleft_y..botright_y {
             for x in topleft_x..botright_x {
@@ -87,6 +114,7 @@ pub struct Button {
     // selected_color: Color,
     // selected_text_color: Color,
     // is_selected: bool,
+    is_clicked: bool,
 }
 impl Button {
     pub fn new(
@@ -119,12 +147,31 @@ impl Button {
             // selected_color,
             // selected_text_color,
             // is_selected: false,
+            is_clicked: false,
         }
     }
 }
 impl Renderable for Button {
-    fn render(&self, buffer: &mut PixelBuffer) -> () {
+    fn render(&mut self, buffer: &mut PixelBuffer) -> () {
+        if self.is_clicked {
+            self.rectangle.color = darken(self.color, 2);
+            self.text.color = darken(self.text_color, 2);
+        } else {
+            self.rectangle.color = self.color;
+            self.text.color = self.text_color;
+        }
         self.rectangle.render(buffer);
         self.text.render(buffer);
+    }
+}
+impl GestureHandler for Button {
+    fn on_event(&mut self, type_: Gesture) -> () {
+        match type_ {
+            Gesture::MouseDown => self.is_clicked = true,
+            _ => self.is_clicked = false,
+        }
+    }
+    fn get_collision_rect(&self) -> Rect {
+        self.rectangle.rect
     }
 }

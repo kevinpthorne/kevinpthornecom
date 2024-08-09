@@ -7,7 +7,10 @@ mod utils;
 use pixels::PixelBuffer;
 use pixels::GREEN;
 use pixels::WHITE;
+use ui::is_point_in_rect;
 use ui::Button;
+use ui::Gesture;
+use ui::GestureHandler;
 use ui::Rectangle;
 use ui::Renderable;
 use ui::Text;
@@ -19,23 +22,22 @@ use web_sys::MouseEvent;
 extern "C" {
     #[wasm_bindgen(js_namespace = console)]
     fn log(s: &str);
-    #[wasm_bindgen(js_namespace = console, js_name = log)]
-    fn log_u32(a: u32);
+    // #[wasm_bindgen(js_namespace = console, js_name = log)]
+    // fn log_u32(a: u32);
 
     fn alert(s: &str);
+}
+
+macro_rules! console_log {
+    // Note that this is using the `log` function imported above during
+    // `bare_bones`
+    ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
 }
 
 #[wasm_bindgen]
 pub fn greet() {
     log("hello world!");
     alert("Hello, kevinpthornecom_wasm!!!");
-}
-
-fn request_animation_frame(f: &Closure<dyn FnMut()>) {
-    window()
-        .expect("should have `window`")
-        .request_animation_frame(f.as_ref().unchecked_ref())
-        .expect("should register `requestAnimationFrame` OK");
 }
 
 const FPS: u32 = 15;
@@ -47,6 +49,8 @@ pub struct CanvasApp {
     tick: usize,
     last_frame_time: u32,
     ui_elements: Vec<Box<dyn Renderable>>,
+    // todo fix
+    gesturehandler_ui_elements: Vec<Box<dyn GestureHandler>>,
 }
 
 #[wasm_bindgen]
@@ -69,9 +73,12 @@ impl CanvasApp {
                 Box::new(Text::new((50, 125), text_text.clone().to_string(), 3, GREEN)),
                 Box::new(Text::new((50, 145), text_text.clone().to_string(), 4, GREEN)),
                 Box::new(Rectangle::new(((10, 100), (20, 110)), WHITE)),
+            ],
+            gesturehandler_ui_elements: vec![
                 Box::new(Button::new((10, 170), "BOOP".to_string(), 3, (120, 120, 120, 255), WHITE)),
             ],
         };
+        log("canvas app loaded");
         Ok(instance)
     }
 
@@ -84,6 +91,15 @@ impl CanvasApp {
 
     pub fn on_click(&mut self, event: MouseEvent) {
         // log(event.page_x());
+        let event_point: (usize, usize) = (event.page_x() as usize, event.page_y() as usize);
+        for gesture_handler in self.gesturehandler_ui_elements.iter_mut().rev() {
+            if is_point_in_rect(event_point, gesture_handler.get_collision_rect()) {
+                console_log!("clicked on something! {:?}", event.type_());
+                if let Some(gesture) = Gesture::of(event.clone()) {
+                    gesture_handler.on_event(gesture);
+                }
+            }
+        }
     }
 
     /// requestAnimationFrame usually calls as fast as the display is
@@ -113,7 +129,10 @@ impl CanvasApp {
         }
 
         // render UI elements
-        for e in &self.ui_elements {
+        for e in &mut self.ui_elements {
+            e.render(&mut self.screenbuff);
+        }
+        for e in &mut self.gesturehandler_ui_elements {
             e.render(&mut self.screenbuff);
         }
         self.screenbuff.render_text(&tick_str, (0, 0), GREEN, 2);

@@ -7,6 +7,9 @@ pub const WHITE: Color = (255, 255, 255, 255);
 pub const RED: Color = (255, 0, 0, 255);
 pub const BLUE: Color = (0, 0, 255, 255);
 pub const GREEN: Color = (0, 255, 0, 255);
+pub fn darken((r, g, b, a): Color, factor: u8) -> Color {
+    (r / factor, g / factor, b / factor, a)
+}
 
 pub struct PixelBuffer {
     data: Vec<u8>,

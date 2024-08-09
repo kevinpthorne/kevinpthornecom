@@ -19,6 +19,12 @@ var app = wasm.init(canvasElement);
 canvasElement.onclick = (event) => {
     app.on_click(event);
 };
+canvasElement.onmousedown = (event) => {
+    app.on_click(event);
+};
+canvasElement.onmouseup = (event) => {
+    app.on_click(event);
+};
 onresize = (event) => {
     canvasElement.width = window.innerWidth;
     canvasElement.height = window.innerHeight;
