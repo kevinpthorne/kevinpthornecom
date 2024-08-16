@@ -1,16 +1,21 @@
 mod bitset;
 mod pixels;
-mod text;
+mod font;
 mod ui;
 mod utils;
 
+use font::GLYPH_SIZE;
 use pixels::PixelBuffer;
 use pixels::GREEN;
+use pixels::RED;
+use pixels::BLUE;
 use pixels::WHITE;
 use ui::is_point_in_rect;
 use ui::Button;
 use ui::Gesture;
 use ui::GestureHandler;
+use ui::HCenter;
+use ui::Positioned;
 use ui::Rectangle;
 use ui::Renderable;
 use ui::Text;
@@ -60,22 +65,24 @@ impl CanvasApp {
         let height = window().unwrap().inner_height().unwrap().as_f64().unwrap() as usize;
         
         // TODO rip this out of the constructor
-        let text_text: String = "ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789 !@#$%^&*()[]{}\\|;':\",./<>?-=_+`~".to_string();
+        let test_text: String = "ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789 !@#$%^&*()[]{}\\|;':\",./<>?-=_+`~".to_string();
+        let test_2: String = "THE QUICK, BROWN FOX JUMPS OVER THE LAZY DOG.".to_string();
         let instance = Self {
             canvas,
             screenbuff: PixelBuffer::new(width, height),
             tick: 0,
             last_frame_time: 0,
             ui_elements: vec![
-                Box::new(Text::new((50, 50), "KEVIN THORNE".to_string(), 4, WHITE)),
-                Box::new(Text::new((50, 100), text_text.clone().to_string(), 1, GREEN)),
-                Box::new(Text::new((50, 110), text_text.clone().to_string(), 2, GREEN)),
-                Box::new(Text::new((50, 125), text_text.clone().to_string(), 3, GREEN)),
-                Box::new(Text::new((50, 145), text_text.clone().to_string(), 4, GREEN)),
-                Box::new(Rectangle::new(((10, 100), (20, 110)), WHITE)),
+                Box::new(HCenter::new((0, 10), Box::new(Text::new("KEVIN P. THORNE".to_string(), 4, WHITE)))),
+                Box::new(Positioned::new((0, 100), Box::new(Text::new(test_text.clone().to_string(), 1, GREEN)))),
+                Box::new(Positioned::new((0, 110), Box::new(Text::new(test_text.clone().to_string(), 2, RED)))),
+                Box::new(Positioned::new((0, 125), Box::new(Text::new(test_text.clone().to_string(), 3, BLUE)))),
+                Box::new(Positioned::new((0, 145), Box::new(Text::new(test_text.clone().to_string(), 4, GREEN)))),
+                Box::new(Positioned::new((0, 170), Box::new(Text::new(test_2.clone().to_string(), 3, GREEN)))),
+                Box::new(Positioned::new((10, 220), Box::new(Rectangle::new((10, 10), WHITE)))),
             ],
             gesturehandler_ui_elements: vec![
-                Box::new(Button::new((10, 170), "BOOP".to_string(), 3, (120, 120, 120, 255), WHITE)),
+                Box::new(Button::new((10, 190), "BOOP".to_string(), 3, (120, 120, 120, 255), WHITE)),
             ],
         };
         log("canvas app loaded");
@@ -119,6 +126,7 @@ impl CanvasApp {
     fn render(&mut self, delta_time: u32) -> Result<(), JsValue> {
         let tick_str: String = self.tick.to_string();
         let frametime_str: String = delta_time.to_string();
+        let stats_str = format!("FRAME {tick_str} . FRAMETIME {frametime_str}");
 
         // fancy gradient background
         for y in 0..self.screenbuff.height {
@@ -135,8 +143,7 @@ impl CanvasApp {
         for e in &mut self.gesturehandler_ui_elements {
             e.render(&mut self.screenbuff);
         }
-        self.screenbuff.render_text(&tick_str, (0, 0), GREEN, 2);
-        self.screenbuff.render_text(&frametime_str, (0, 15), GREEN, 2);
+        self.screenbuff.render_text(&stats_str, (0, self.screenbuff.height - (GLYPH_SIZE * 2)), GREEN, 2);
 
         let clamped_data = wasm_bindgen::Clamped(self.screenbuff.data_as_ref());
         let image_data =

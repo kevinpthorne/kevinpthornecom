@@ -1,4 +1,4 @@
-use crate::{bitset::Bitset, text::{get_glyph, GLYPH_SIZE, KERNING}, ui::Point};
+use crate::{bitset::Bitset, font::{get_glyph, GLYPH_SIZE, KERNING}, ui::Point};
 
 
 pub type Color = (u8, u8, u8, u8);

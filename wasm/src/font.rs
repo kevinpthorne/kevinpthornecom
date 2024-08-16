@@ -49,6 +49,9 @@ const SEVEN: FontGlyph =    0b0000000_0010000100010001000011111;
 const EIGHT: FontGlyph =    0b0000000_0111010001011101000101110;
 const NINE: FontGlyph =     0b0000000_0111010000111101000101110;
 const ZERO: FontGlyph =     0b0000000_0111010011101011100101110;
+const DASH: FontGlyph =     0b0000000_0000000000011100000000000;
+const PERIOD: FontGlyph =   0b0000000_0000000100000000000000000;
+const COMMA: FontGlyph =    0b0000000_0001000100000000000000000;
 const UNKNOWN: FontGlyph = 0b0000000_1010101010101010101010101;
 const EMPTY: FontGlyph =   0b0000000_0000000000000000000000000;
 
@@ -95,6 +98,9 @@ pub fn get_glyph(c: char) -> FontGlyph {
         '8' => EIGHT,
         '9' => NINE,
         '0' => ZERO,
+        '-' => DASH,
+        '.' => PERIOD,
+        ',' => COMMA,
         ' ' => EMPTY,
         _ => UNKNOWN,
     }
